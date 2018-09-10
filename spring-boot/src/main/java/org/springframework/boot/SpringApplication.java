@@ -298,16 +298,21 @@ public class SpringApplication {
 		ConfigurableApplicationContext context = null;
 		FailureAnalyzers analyzers = null;
 		configureHeadlessProperty();
+		//加载Run Listeners(EventPublishingRunListener)
 		SpringApplicationRunListeners listeners = getRunListeners(args);
 		listeners.starting();
 		try {
+			//应用程序参数
 			ApplicationArguments applicationArguments = new DefaultApplicationArguments(
 					args);
+			//创建并配置Environment
 			ConfigurableEnvironment environment = prepareEnvironment(listeners,
 					applicationArguments);
 			Banner printedBanner = printBanner(environment);
+			//创建应用上下文（AnnotationConfigEmbeddedWebApplicationContext）
 			context = createApplicationContext();
 			analyzers = new FailureAnalyzers(context);
+			//预处理上下文
 			prepareContext(context, environment, listeners, applicationArguments,
 					printedBanner);
 			refreshContext(context);
@@ -343,7 +348,9 @@ public class SpringApplication {
 	private void prepareContext(ConfigurableApplicationContext context,
 			ConfigurableEnvironment environment, SpringApplicationRunListeners listeners,
 			ApplicationArguments applicationArguments, Banner printedBanner) {
+		//往上下文中放入运行环境
 		context.setEnvironment(environment);
+		//
 		postProcessApplicationContext(context);
 		applyInitializers(context);
 		listeners.contextPrepared(context);
