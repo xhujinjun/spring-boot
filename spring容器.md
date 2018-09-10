@@ -1,0 +1,2 @@
+# Spring容器就是一个BeanFactory
+beanFactory中有一系列的bean definitions(唯一的string name)

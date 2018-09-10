@@ -240,15 +240,25 @@ public class SpringApplication {
 		initialize(sources);
 	}
 
+	/**
+	 * 初始化SpringApplication
+	 * 	 实例化所有应用实例化类
+	 * 	 实例化所有应用监听器
+	 * 	 实例化启动类
+	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private void initialize(Object[] sources) {
 		if (sources != null && sources.length > 0) {
 			this.sources.addAll(Arrays.asList(sources));
 		}
+		//检测是否是web环境(判断条件是环境中是否存在ConfigurableWebApplicationContext和Sevlet类)
 		this.webEnvironment = deduceWebEnvironment();
+		//从spring.factories中获取ApplicationContextInitializer的列表并实例化bean
 		setInitializers((Collection) getSpringFactoriesInstances(
 				ApplicationContextInitializer.class));
+		//从spring.factories中获取类型为ApplicationListener的列表并实例化bean
 		setListeners((Collection) getSpringFactoriesInstances(ApplicationListener.class));
+		//找到启动类
 		this.mainApplicationClass = deduceMainApplicationClass();
 	}
 

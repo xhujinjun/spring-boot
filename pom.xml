@@ -75,6 +75,7 @@
 				<activeByDefault>true</activeByDefault>
 			</activation>
 			<modules>
+				<module>spring-boot-samples</module>
 				<module>spring-boot-dependencies</module>
 				<module>spring-boot-parent</module>
 				<module>spring-boot-tools</module>
