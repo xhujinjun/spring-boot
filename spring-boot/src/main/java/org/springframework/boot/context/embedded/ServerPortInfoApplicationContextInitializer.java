@@ -52,7 +52,8 @@ public class ServerPortInfoApplicationContextInitializer
 		implements ApplicationContextInitializer<ConfigurableApplicationContext> {
 
 	@Override
-	public void initialize(ConfigurableApplicationContext applicationContext) {
+	public void
+	initialize(ConfigurableApplicationContext applicationContext) {
 		applicationContext.addApplicationListener(
 				new ApplicationListener<EmbeddedServletContainerInitializedEvent>() {
 

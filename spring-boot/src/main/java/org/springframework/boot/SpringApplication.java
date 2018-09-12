@@ -242,9 +242,24 @@ public class SpringApplication {
 
 	/**
 	 * 初始化SpringApplication
-	 * 	 实例化所有应用实例化类
-	 * 	 实例化所有应用监听器
-	 * 	 实例化启动类
+	 *   检测是否是web环境
+	 * 	 实例化所有ApplicationContextInitializer(用来初始化应用上下文，在上下文refashe之前)
+	 * 	   org.springframework.boot.context.ConfigurationWarningsApplicationContextInitializer(BeanFactoryPostProcessor)
+	 *     org.springframework.boot.context.ContextIdApplicationContextInitializer(应用上下文id)
+	 *     org.springframework.boot.context.config.DelegatingApplicationContextInitializer(委托上下文)
+	 *     org.springframework.boot.context.embedded.ServerPortInfoApplicationContextInitializer
+	 * 	 实例化所有ApplicationListener
+	 * 	   org.springframework.context.ApplicationListener=\
+	 * 	   org.springframework.boot.ClearCachesApplicationListener,\
+	 * 	   org.springframework.boot.builder.ParentContextCloserApplicationListener,\
+	 * 	   org.springframework.boot.context.FileEncodingApplicationListener,\
+	 * 	   org.springframework.boot.context.config.AnsiOutputApplicationListener,\
+	 * 	   org.springframework.boot.context.config.ConfigFileApplicationListener,\
+	 * 	   org.springframework.boot.context.config.DelegatingApplicationListener,\
+	 * 	   org.springframework.boot.liquibase.LiquibaseServiceLocatorApplicationListener,\
+	 * 	   org.springframework.boot.logging.ClasspathLoggingApplicationListener,\
+	 * 	   org.springframework.boot.logging.LoggingApplicationListener
+	 * 	 实例化启动类(mainApplicationClass)
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private void initialize(Object[] sources) {
@@ -298,8 +313,10 @@ public class SpringApplication {
 		ConfigurableApplicationContext context = null;
 		FailureAnalyzers analyzers = null;
 		configureHeadlessProperty();
-		//加载Run Listeners(EventPublishingRunListener)
+		//加载SpringAllication类的run方法的所有Listeners(EventPublishingRunListener)
+		//SpringApplicationRunListener 可以看出run方法整个过程（上下文生命周期）
 		SpringApplicationRunListeners listeners = getRunListeners(args);
+		//发布ApplicationStartedEvent事件（ApplicationListener来监听）
 		listeners.starting();
 		try {
 			//应用程序参数
