@@ -249,15 +249,14 @@ public class SpringApplication {
 	 *     org.springframework.boot.context.config.DelegatingApplicationContextInitializer(委托上下文)
 	 *     org.springframework.boot.context.embedded.ServerPortInfoApplicationContextInitializer
 	 * 	 实例化所有ApplicationListener
-	 * 	   org.springframework.context.ApplicationListener=\
-	 * 	   org.springframework.boot.ClearCachesApplicationListener,\
-	 * 	   org.springframework.boot.builder.ParentContextCloserApplicationListener,\
-	 * 	   org.springframework.boot.context.FileEncodingApplicationListener,\
-	 * 	   org.springframework.boot.context.config.AnsiOutputApplicationListener,\
-	 * 	   org.springframework.boot.context.config.ConfigFileApplicationListener,\
-	 * 	   org.springframework.boot.context.config.DelegatingApplicationListener,\
-	 * 	   org.springframework.boot.liquibase.LiquibaseServiceLocatorApplicationListener,\
-	 * 	   org.springframework.boot.logging.ClasspathLoggingApplicationListener,\
+	 * 	   org.springframework.boot.ClearCachesApplicationListener
+	 * 	   org.springframework.boot.builder.ParentContextCloserApplicationListener
+	 * 	   org.springframework.boot.context.FileEncodingApplicationListener
+	 * 	   org.springframework.boot.context.config.AnsiOutputApplicationListener
+	 * 	   org.springframework.boot.context.config.ConfigFileApplicationListener
+	 * 	   org.springframework.boot.context.config.DelegatingApplicationListener
+	 * 	   org.springframework.boot.liquibase.LiquibaseServiceLocatorApplicationListener
+	 * 	   org.springframework.boot.logging.ClasspathLoggingApplicationListener
 	 * 	   org.springframework.boot.logging.LoggingApplicationListener
 	 * 	 实例化启动类(mainApplicationClass)
 	 */
@@ -315,14 +314,32 @@ public class SpringApplication {
 		configureHeadlessProperty();
 		//加载SpringAllication类的run方法的所有Listeners(EventPublishingRunListener)
 		//SpringApplicationRunListener 可以看出run方法整个过程（上下文生命周期）
+
+		//ApplicationStartedEvent: 在Environment和ApplicationContext可用之前,ApplicationListener加载之后
+		//ApplicationEnvironmentPreparedEvent：当SpringApplication正在启动系统，Environment第一次可用
+		//ApplicationPreparedEvent: ApplicationContext prepared 但是还没refresh
+		//ApplicationReadyEvent: 启动完成准备提供服务
+		//ApplicationFailedEvent：当SpringApplication启动系统失败
+
+        // org.springframework.boot.ClearCachesApplicationListener(ContextRefreshedEvent)
+		//  org.springframework.boot.builder.ParentContextCloserApplicationListener(ParentContextAvailableEvent)
+		// org.springframework.boot.context.FileEncodingApplicationListener(ApplicationEnvironmentPreparedEvent)
+		// org.springframework.boot.context.config.AnsiOutputApplicationListener(ApplicationEnvironmentPreparedEvent)
+		// org.springframework.boot.context.config.ConfigFileApplicationListener(ApplicationEnvironmentPreparedEvent, )
+		//  org.springframework.boot.context.config.DelegatingApplicationListener
+		// org.springframework.boot.liquibase.LiquibaseServiceLocatorApplicationListener,ApplicationPreparedEvent)
+		// org.springframework.boot.logging.ClasspathLoggingApplicationListener(ApplicationEnvironmentPreparedEvent, ApplicationFailedEvent)
+		//  org.springframework.boot.logging.LoggingApplicationListener	(all)
 		SpringApplicationRunListeners listeners = getRunListeners(args);
-		//发布ApplicationStartedEvent事件（ApplicationListener来监听）
+
+		//事件流1：发布ApplicationStartedEvent事件（ApplicationListener来监听）
 		listeners.starting();
 		try {
 			//应用程序参数
-			ApplicationArguments applicationArguments = new DefaultApplicationArguments(
-					args);
+			ApplicationArguments applicationArguments = new DefaultApplicationArguments(args);
+
 			//创建并配置Environment
+			//事件流2：发布ApplicationEnvironmentPreparedEvent事件
 			ConfigurableEnvironment environment = prepareEnvironment(listeners,
 					applicationArguments);
 			Banner printedBanner = printBanner(environment);
@@ -330,10 +347,12 @@ public class SpringApplication {
 			context = createApplicationContext();
 			analyzers = new FailureAnalyzers(context);
 			//预处理上下文
+			//事件流3/：发布ApplicationPreparedEvent
 			prepareContext(context, environment, listeners, applicationArguments,
 					printedBanner);
 			refreshContext(context);
 			afterRefresh(context, applicationArguments);
+			//事件流4/5：发布ApplicationReadyEvent或ApplicationFailedEvent事件
 			listeners.finished(context, null);
 			stopWatch.stop();
 			if (this.logStartupInfo) {

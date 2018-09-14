@@ -43,36 +43,62 @@ class SpringApplicationRunListeners {
 		this.listeners = new ArrayList<SpringApplicationRunListener>(listeners);
 	}
 
+	/**
+	 * 实例化SpringApplication之后
+	 */
 	public void starting() {
 		for (SpringApplicationRunListener listener : this.listeners) {
 			listener.starting();
 		}
 	}
 
+	/**
+	 * 准备好Environment之后
+	 * @param environment
+	 */
 	public void environmentPrepared(ConfigurableEnvironment environment) {
 		for (SpringApplicationRunListener listener : this.listeners) {
 			listener.environmentPrepared(environment);
 		}
 	}
 
+	/**
+	 * 准备好 context之后
+	 * @param context
+	 */
 	public void contextPrepared(ConfigurableApplicationContext context) {
 		for (SpringApplicationRunListener listener : this.listeners) {
 			listener.contextPrepared(context);
 		}
 	}
 
+	/**
+	 * 加载context之后
+	 * @param context
+	 */
 	public void contextLoaded(ConfigurableApplicationContext context) {
 		for (SpringApplicationRunListener listener : this.listeners) {
 			listener.contextLoaded(context);
 		}
 	}
 
+	/**
+	 * 完成
+	 * @param context
+	 * @param exception
+	 */
 	public void finished(ConfigurableApplicationContext context, Throwable exception) {
 		for (SpringApplicationRunListener listener : this.listeners) {
 			callFinishedListener(listener, context, exception);
 		}
 	}
 
+	/**
+	 * 失败
+	 * @param listener
+	 * @param context
+	 * @param exception
+	 */
 	private void callFinishedListener(SpringApplicationRunListener listener,
 			ConfigurableApplicationContext context, Throwable exception) {
 		try {

@@ -21,7 +21,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class Consumer {
-
+// Diagram
 	@JmsListener(destination = "sample.queue")
 	public void receiveQueue(String text) {
 		System.out.println(text);
