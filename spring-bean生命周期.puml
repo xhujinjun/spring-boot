@@ -1,0 +1,19 @@
+@startuml
+Alice -> Bob: Authentication Request
+
+AbstractApplicationContext.finishBeanFactoryInitialization
+DefaultListableBeanFactory.preInstantiateSingletons -> getBean()
+AbstractBeanFactory.getBean
+AbstractBeanFactory.doGetBean
+
+
+AbstractAutowireCapableBeanFactory
+@enduml
+
+
+beanDefi
+RoutBeanDef
+BeanWrapper
+
+
+AbstractAutowireCapableBeanFactory.doCreateBean

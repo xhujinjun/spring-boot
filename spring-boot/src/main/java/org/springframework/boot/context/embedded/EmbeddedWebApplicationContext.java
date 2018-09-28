@@ -131,6 +131,7 @@ public class EmbeddedWebApplicationContext extends GenericWebApplicationContext 
 	protected void onRefresh() {
 		super.onRefresh();
 		try {
+			//创建嵌入式Servlet容器
 			createEmbeddedServletContainer();
 		}
 		catch (Throwable ex) {
@@ -182,7 +183,7 @@ public class EmbeddedWebApplicationContext extends GenericWebApplicationContext 
 	 * @return a {@link EmbeddedServletContainerFactory} (never {@code null})
 	 */
 	protected EmbeddedServletContainerFactory getEmbeddedServletContainerFactory() {
-		// Use bean names so that we don't consider the hierarchy
+		// Use bean names so that we don't consider the hierarchy tomcatEmbeddedServletContainerFactory
 		String[] beanNames = getBeanFactory()
 				.getBeanNamesForType(EmbeddedServletContainerFactory.class);
 		if (beanNames.length == 0) {
@@ -225,6 +226,9 @@ public class EmbeddedWebApplicationContext extends GenericWebApplicationContext 
 		existingScopes.restore();
 		WebApplicationContextUtils.registerEnvironmentBeans(beanFactory,
 				getServletContext());
+		//初始化Servlet/Filter/Listener
+		//ServletRegistrationBean FilterRegistrationBean ServletListenerRegistrationBean
+		//DispatcherServlet CrderedCharacterEncodingFilter OrderedHiddenHttpMethodFilter OrderedHttpPutFormContentFilter OrderedRequestContextFilter SampleTomcatApplication
 		for (ServletContextInitializer beans : getServletContextInitializerBeans()) {
 			beans.onStartup(servletContext);
 		}

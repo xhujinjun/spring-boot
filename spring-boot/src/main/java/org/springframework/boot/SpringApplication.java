@@ -266,13 +266,15 @@ public class SpringApplication {
 			this.sources.addAll(Arrays.asList(sources));
 		}
 		//检测是否是web环境(判断条件是环境中是否存在ConfigurableWebApplicationContext和Sevlet类)
+		//后续会根据是不是web环境来加载不同的上下文（AnnotationConfigEmbeddedWebApplicationContext， AnnotationConfigApplicationContext）
 		this.webEnvironment = deduceWebEnvironment();
+
 		//从spring.factories中获取ApplicationContextInitializer的列表并实例化bean
 		setInitializers((Collection) getSpringFactoriesInstances(
 				ApplicationContextInitializer.class));
 		//从spring.factories中获取类型为ApplicationListener的列表并实例化bean
 		setListeners((Collection) getSpringFactoriesInstances(ApplicationListener.class));
-		//找到启动类
+		//找到启动类(sources)
 		this.mainApplicationClass = deduceMainApplicationClass();
 	}
 
@@ -312,7 +314,7 @@ public class SpringApplication {
 		ConfigurableApplicationContext context = null;
 		FailureAnalyzers analyzers = null;
 		configureHeadlessProperty();
-		//加载SpringAllication类的run方法的所有Listeners(EventPublishingRunListener)
+		//加载SpringApplication类的run方法的所有Listeners(EventPublishingRunListener)
 		//SpringApplicationRunListener 可以看出run方法整个过程（上下文生命周期）
 
 		//ApplicationStartedEvent: 在Environment和ApplicationContext可用之前,ApplicationListener加载之后
@@ -338,19 +340,31 @@ public class SpringApplication {
 			//应用程序参数
 			ApplicationArguments applicationArguments = new DefaultApplicationArguments(args);
 
-			//创建并配置Environment
-			//事件流2：发布ApplicationEnvironmentPreparedEvent事件
+
+			//======================
+			//  创建并配置Environment
+			//======================
+			//事件流2：发布ApplicationEnvironmentPreparedEvent事件(Spring-cloud BootstrapApplicationListener)
 			ConfigurableEnvironment environment = prepareEnvironment(listeners,
 					applicationArguments);
 			Banner printedBanner = printBanner(environment);
-			//创建应用上下文（AnnotationConfigEmbeddedWebApplicationContext）
+
+			//======================
+			//  Create, load, refresh and run the ApplicationContext
+			//======================
+			//1. 创建应用上下文（BeanDefinitionReader， BeanDefinitionScanner, DefaultListableBeanFactory）
 			context = createApplicationContext();
 			analyzers = new FailureAnalyzers(context);
-			//预处理上下文
+
+
+			//2. 预处理上下文
 			//事件流3/：发布ApplicationPreparedEvent
 			prepareContext(context, environment, listeners, applicationArguments,
 					printedBanner);
+			//3. 刷新context
 			refreshContext(context);
+
+			//刷新context后处理
 			afterRefresh(context, applicationArguments);
 			//事件流4/5：发布ApplicationReadyEvent或ApplicationFailedEvent事件
 			listeners.finished(context, null);
@@ -386,9 +400,13 @@ public class SpringApplication {
 			ApplicationArguments applicationArguments, Banner printedBanner) {
 		//往上下文中放入运行环境
 		context.setEnvironment(environment);
-		//
+
 		postProcessApplicationContext(context);
+
+		//使用ApplicationContextInitializer来初始化上下文
 		applyInitializers(context);
+
+		//发布上下文准备好了事件
 		listeners.contextPrepared(context);
 		if (this.logStartupInfo) {
 			logStartupInfo(context.getParent() == null);

@@ -74,7 +74,7 @@ class BeanDefinitionLoader {
 	 * @param registry the bean definition registry that will contain the loaded beans
 	 * @param sources the bean sources
 	 */
-	BeanDefinitionLoader(BeanDefinitionRegistry registry, Object... sources) {
+	 BeanDefinitionLoader(BeanDefinitionRegistry registry, Object... sources) {
 		Assert.notNull(registry, "Registry must not be null");
 		Assert.notEmpty(sources, "Sources must not be empty");
 		this.sources = sources;
