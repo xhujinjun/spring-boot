@@ -213,6 +213,46 @@ public class SpringApplication {
 	private Set<String> additionalProfiles = new HashSet<String>();
 
 	/**
+	 * A basic main that can be used to launch an application. This method is useful when
+	 * application sources are defined via a {@literal --spring.main.sources} command line
+	 * argument.
+	 * <p>
+	 * Most developers will want to define their own main method and call the
+	 * {@link #run(Object, String...) run} method instead.
+	 * @param args command line arguments
+	 * @throws Exception if the application cannot be started
+	 * @see SpringApplication#run(Object[], String[])
+	 * @see SpringApplication#run(Object, String...)
+	 */
+	public static void main(String[] args) throws Exception {
+		SpringApplication.run(new Object[0], args);
+	}
+
+	/**
+	 * Static helper that can be used to run a {@link SpringApplication} from the
+	 * specified source using default settings.
+	 * @param source the source to load
+	 * @param args the application arguments (usually passed from a Java main method)
+	 * @return the running {@link ApplicationContext}
+	 */
+	public static ConfigurableApplicationContext run(Object source, String... args) {
+		return run(new Object[] { source }, args);
+	}
+
+	/**
+	 * Static helper that can be used to run a {@link SpringApplication} from the
+	 * specified sources using default settings and user supplied arguments.
+	 * @param sources the sources to load
+	 * @param args the application arguments (usually passed from a Java main method)
+	 * @return the running {@link ApplicationContext}
+	 */
+	public static ConfigurableApplicationContext run(Object[] sources, String[] args) {
+		return new SpringApplication(sources).run(args);
+	}
+
+
+
+	/**
 	 * Create a new {@link SpringApplication} instance. The application context will load
 	 * beans from the specified sources (see {@link SpringApplication class-level}
 	 * documentation for details. The instance can be customized before calling
@@ -1165,44 +1205,6 @@ public class SpringApplication {
 	 */
 	public Set<ApplicationListener<?>> getListeners() {
 		return asUnmodifiableOrderedSet(this.listeners);
-	}
-
-	/**
-	 * Static helper that can be used to run a {@link SpringApplication} from the
-	 * specified source using default settings.
-	 * @param source the source to load
-	 * @param args the application arguments (usually passed from a Java main method)
-	 * @return the running {@link ApplicationContext}
-	 */
-	public static ConfigurableApplicationContext run(Object source, String... args) {
-		return run(new Object[] { source }, args);
-	}
-
-	/**
-	 * Static helper that can be used to run a {@link SpringApplication} from the
-	 * specified sources using default settings and user supplied arguments.
-	 * @param sources the sources to load
-	 * @param args the application arguments (usually passed from a Java main method)
-	 * @return the running {@link ApplicationContext}
-	 */
-	public static ConfigurableApplicationContext run(Object[] sources, String[] args) {
-		return new SpringApplication(sources).run(args);
-	}
-
-	/**
-	 * A basic main that can be used to launch an application. This method is useful when
-	 * application sources are defined via a {@literal --spring.main.sources} command line
-	 * argument.
-	 * <p>
-	 * Most developers will want to define their own main method and call the
-	 * {@link #run(Object, String...) run} method instead.
-	 * @param args command line arguments
-	 * @throws Exception if the application cannot be started
-	 * @see SpringApplication#run(Object[], String[])
-	 * @see SpringApplication#run(Object, String...)
-	 */
-	public static void main(String[] args) throws Exception {
-		SpringApplication.run(new Object[0], args);
 	}
 
 	/**
