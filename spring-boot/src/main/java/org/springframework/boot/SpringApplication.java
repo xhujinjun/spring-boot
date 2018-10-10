@@ -283,12 +283,22 @@ public class SpringApplication {
 	/**
 	 * 初始化SpringApplication
 	 *   检测是否是web环境
-	 * 	 实例化所有ApplicationContextInitializer(用来初始化应用上下文，在上下文refashe之前)
+	 * 	 实例化所有ApplicationContextInitializer(用来初始化应用上下文，在上下文refashe之前)（org.springframework.context.ApplicationContextInitializer）
+	 *
+	 * 	   spring-boot模块下的spring.factories：
 	 * 	   org.springframework.boot.context.ConfigurationWarningsApplicationContextInitializer(BeanFactoryPostProcessor)
 	 *     org.springframework.boot.context.ContextIdApplicationContextInitializer(应用上下文id)
 	 *     org.springframework.boot.context.config.DelegatingApplicationContextInitializer(委托上下文)
 	 *     org.springframework.boot.context.embedded.ServerPortInfoApplicationContextInitializer
-	 * 	 实例化所有ApplicationListener
+	 *
+	 *     spring-boot-autoconfigure的spring.factories:
+	 *     org.springframework.boot.autoconfigure.SharedMetadataReaderFactoryContextInitializer(CachingMetadataReaderFactoryPostProcessor)
+	 *     org.springframework.boot.autoconfigure.logging.AutoConfigurationReportLoggingInitializer
+	 *
+	 *
+	 * 	 实例化所有ApplicationListener(org.springframework.context.ApplicationListener)
+	 *
+	 * 	   spring-boot模块下的spring.factories：
 	 * 	   org.springframework.boot.ClearCachesApplicationListener
 	 * 	   org.springframework.boot.builder.ParentContextCloserApplicationListener
 	 * 	   org.springframework.boot.context.FileEncodingApplicationListener
@@ -298,6 +308,9 @@ public class SpringApplication {
 	 * 	   org.springframework.boot.liquibase.LiquibaseServiceLocatorApplicationListener
 	 * 	   org.springframework.boot.logging.ClasspathLoggingApplicationListener
 	 * 	   org.springframework.boot.logging.LoggingApplicationListener
+	 *
+	 * 	   spring-boot-autoconfigure的spring.factories:
+	 * 	   org.springframework.boot.autoconfigure.BackgroundPreinitializer
 	 * 	 实例化启动类(mainApplicationClass)
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -398,7 +411,7 @@ public class SpringApplication {
 
 
 			//2. 预处理上下文
-			//事件流3/：发布ApplicationPreparedEvent
+			//事件流3：发布ApplicationPreparedEvent
 			prepareContext(context, environment, listeners, applicationArguments,
 					printedBanner);
 			//3. 刷新context
