@@ -126,6 +126,7 @@ import org.springframework.web.servlet.view.InternalResourceViewResolver;
 @ConditionalOnWebApplication
 @ConditionalOnClass({ Servlet.class, DispatcherServlet.class,
 		WebMvcConfigurerAdapter.class })
+//自动配置起效的条件是上下文中没有WebMvcConfigurationSupport类型的bean(即没有配置@EnableWebMvc)
 @ConditionalOnMissingBean(WebMvcConfigurationSupport.class)
 @AutoConfigureOrder(Ordered.HIGHEST_PRECEDENCE + 10)
 @AutoConfigureAfter({ DispatcherServletAutoConfiguration.class,
@@ -152,7 +153,7 @@ public class WebMvcAutoConfiguration {
 	// Defined as a nested config to ensure WebMvcConfigurerAdapter is not read when not
 	// on the classpath
 	@Configuration
-	@Import(EnableWebMvcConfiguration.class)
+	@Import(EnableWebMvcConfiguration.class) //先处理EnableWebMvcConfiguration
 	@EnableConfigurationProperties({ WebMvcProperties.class, ResourceProperties.class })
 	public static class WebMvcAutoConfigurationAdapter extends WebMvcConfigurerAdapter {
 

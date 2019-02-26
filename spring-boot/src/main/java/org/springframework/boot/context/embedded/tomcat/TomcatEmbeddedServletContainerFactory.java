@@ -162,20 +162,28 @@ public class TomcatEmbeddedServletContainerFactory
 	@Override
 	public EmbeddedServletContainer getEmbeddedServletContainer(
 			ServletContextInitializer... initializers) {
+		//1. 构建一个 Minimal tomcat starter for embedding 对象
 		Tomcat tomcat = new Tomcat();
+		//2. 设置tomcat work 目录
 		File baseDir = (this.baseDirectory != null) ? this.baseDirectory
 				: createTempDir("tomcat");
 		tomcat.setBaseDir(baseDir.getAbsolutePath());
+		//3. 连接器(Connector)组件
+		// 连接器org.apache.coyote.http11.Http11NioProtocol
 		Connector connector = new Connector(this.protocol);
+		//service组件
 		tomcat.getService().addConnector(connector);
 		customizeConnector(connector);
 		tomcat.setConnector(connector);
 		tomcat.getHost().setAutoDeploy(false);
+		//4. 容器(Container)组件
 		configureEngine(tomcat.getEngine());
 		for (Connector additionalConnector : this.additionalTomcatConnectors) {
 			tomcat.getService().addConnector(additionalConnector);
 		}
+		//5. 初始化上下文（serlvet,Listener,Filter）
 		prepareContext(tomcat.getHost(), initializers);
+		//6. 启动容器
 		return getTomcatEmbeddedServletContainer(tomcat);
 	}
 
